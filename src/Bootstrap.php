@@ -132,7 +132,15 @@ final class Bootstrap
 
     private static function normalizeClasses(string|array $classes): string
     {
-        $classList = is_array($classes) ? $classes : (preg_split('/\s+/', trim($classes)) ?: []);
+        if (is_array($classes)) {
+            $classList = $classes;
+        } else {
+            $trimmedClasses = trim($classes);
+            $classList = $trimmedClasses === ''
+                ? []
+                : (preg_split('/\s+/', $trimmedClasses) ?: []);
+        }
+
         $classList = array_values(array_unique(array_filter(array_map('strval', $classList))));
 
         return implode(' ', $classList);

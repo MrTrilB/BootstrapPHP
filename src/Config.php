@@ -68,8 +68,21 @@ final class Config
 
     private function buildAssetUrl(string $path): string
     {
-        $baseUrl = str_replace('{version}', $this->version, $this->assetBaseUrl);
+        $baseUrl = rtrim(str_replace('{version}', $this->version, $this->assetBaseUrl), '/');
+        $assetPath = ltrim($path, '/');
 
-        return rtrim($baseUrl, '/') . '/' . ltrim($path, '/');
+        if ($baseUrl === '' && $assetPath === '') {
+            return '';
+        }
+
+        if ($baseUrl === '') {
+            return $assetPath;
+        }
+
+        if ($assetPath === '') {
+            return $baseUrl;
+        }
+
+        return $baseUrl . '/' . $assetPath;
     }
 }
