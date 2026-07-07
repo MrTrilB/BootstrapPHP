@@ -1,0 +1,23 @@
+{
+    "name": "mrtrilb/bootstrap-php",
+    "description": "Bootstrap helpers and configuration for any PHP project.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "bootstrap",
+        "php",
+        "composer",
+        "frontend"
+    ],
+    "require": {
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "BootstrapPHP\\": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    }
+}
