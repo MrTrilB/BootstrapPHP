@@ -1,5 +1,5 @@
 {
-    "name": "mrtrilb/bootstrap-php",
+    "name": "trilbdev/bootstrapphp",
     "description": "Bootstrap helpers and configuration for any PHP project.",
     "type": "library",
     "license": "MIT",
@@ -9,15 +9,22 @@
         "composer",
         "frontend"
     ],
+    "homepage": "https://trilb.dev/collection/assets/library/BootstrapPHP/",
+    "authors": [
+        {
+            "name": "Anthony Blüthner",
+            "email": "mrtrilb@trilb.dev",
+            "homepage": "https://trilb.dev",
+            "role": "Developer"
+        }
+    ],
     "require": {
-        "php": "^8.1"
+        "php": "^8.1",
+        "twbs/bootstrap": "5.3.8"
     },
     "autoload": {
         "psr-4": {
             "BootstrapPHP\\": "src/"
-        },
-        "files": [
-            "src/functions.php"
-        ]
+        }
     }
 }

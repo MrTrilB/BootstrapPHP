@@ -2,19 +2,22 @@
 
 A Composer-ready PHP library for adding Bootstrap assets, components, and configuration to any PHP project through classes and helper functions.
 
+Bootstrap assets are included locally under `src/Assets/dist`, so the default helpers generate local paths instead of relying on a CDN.
+
 ## Installation
 
 ```bash
-composer require mrtrilb/bootstrap-php
+composer require trilbdev/bootstrapphp
 ```
 
 ## What it provides
 
 - Bootstrap CSS and JavaScript tag generation
+- Local Bootstrap assets included under `src/Assets/dist`
 - Configurable Bootstrap asset URLs
 - Reusable HTML component rendering with Bootstrap classes
-- Convenience helpers for common components such as alerts, buttons, and containers
-- Both class-based and function-based APIs
+- Convenience helpers for common components such as alerts, buttons, containers, and accordions
+- Class-based API with per-element helper classes
 
 ## Class-based usage
 
@@ -42,28 +45,39 @@ echo Bootstrap::container(
     [],
     false
 );
+
+echo Bootstrap::accordion([
+    [
+        'title' => 'Accordion Item #1',
+        'content' => '<strong>This is the first item.</strong>',
+        'opened' => true,
+    ],
+    [
+        'title' => 'Accordion Item #2',
+        'content' => 'This is the second item.',
+    ],
+]);
 ```
 
-## Function-based usage
+## URL helpers
+
+You can access Bootstrap asset URLs directly:
 
 ```php
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
+use BootstrapPHP\Bootstrap;
 
-$config = bootstrapphp_config([
-    'version' => '5.3.3',
-]);
+$config = Bootstrap::config([ 'version' => '5.3.8' ]);
 
-echo bootstrapphp_css_tag($config);
-echo bootstrapphp_js_tag($config);
-echo bootstrapphp_alert('Profile updated', 'info');
-echo bootstrapphp_button('Save', 'success');
+$cssUrl = Bootstrap::cssUrl($config);
+$jsUrl = Bootstrap::jsUrl($config);
+$customUrl = Bootstrap::assetUrl('css/bootstrap.min.css', $config);
 ```
 
 ## Custom configuration
 
-You can point the package at a CDN, a local asset directory, or fully custom asset URLs:
+You can point the package at a local asset directory or fully custom asset URLs:
 
 ```php
 <?php
