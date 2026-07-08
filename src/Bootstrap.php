@@ -55,7 +55,37 @@ final class Bootstrap
 
     public static function assets(?BootstrapAssets $config = null, string $separator = PHP_EOL): string
     {
+        $config ??= new BootstrapAssets();
+
+        $package = $config->package();
+
+        // If package specified, return only that package's tag
+        if ($package === 'css') {
+            $variant = $config->type() ?? 'bootstrap';
+            $minified = ($config->build() ?? 'min') === 'min';
+            $rtl = $config->rtl();
+
+            return self::cssTag($config, $variant, $rtl, $minified);
+        }
+
+        if ($package === 'js') {
+            $variant = $config->type() ?? 'bundle';
+            $minified = ($config->build() ?? 'min') === 'min';
+
+            return self::jsTag($config, $variant, $minified);
+        }
+
         return self::cssTag($config) . $separator . self::jsTag($config);
+    }
+
+    public static function assetsUrls(?BootstrapAssets $config = null): array
+    {
+        $config ??= new BootstrapAssets();
+
+        return [
+            'css' => $config->cssUrl(),
+            'js' => $config->jsUrl(),
+        ];
     }
 
     public static function cssUrl(?BootstrapAssets $config = null, string $variant = 'bootstrap', bool $rtl = false, bool $minified = true): string

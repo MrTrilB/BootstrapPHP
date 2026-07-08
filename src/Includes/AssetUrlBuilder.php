@@ -6,8 +6,12 @@ namespace BootstrapPHP\Includes;
 
 final class AssetUrlBuilder
 {
-    public static function build(string $version, string $assetBaseUrl, string $path): string
+    private const ASSET_BASE = '/vendor/twbs/bootstrap/dist';
+
+    public static function build(string $version, string $path): string
     {
+        // The asset base is intentionally fixed here (project vendor dist).
+        $assetBaseUrl = self::ASSET_BASE;
         $baseUrl = rtrim(str_replace('{version}', $version, $assetBaseUrl), '/');
         $assetPath = ltrim($path, '/');
 
@@ -26,10 +30,11 @@ final class AssetUrlBuilder
         return $baseUrl . '/' . $assetPath;
     }
 
-    public static function css(string $version, string $assetBaseUrl, string $variant = 'bootstrap', bool $rtl = false, bool $minified = true): string
+    public static function css(string $version, string $variant = 'bootstrap', bool $rtl = false, bool $minified = true): string
     {
-        $name = match (strtolower($variant)) {
-            '', 'bootstrap' => 'bootstrap',
+        $v = strtolower($variant);
+        $name = match ($v) {
+            '', 'bootstrap', 'none' => 'bootstrap',
             'grid' => 'bootstrap-grid',
             'reboot' => 'bootstrap-reboot',
             'utilities' => 'bootstrap-utilities',
@@ -38,13 +43,14 @@ final class AssetUrlBuilder
 
         $path = sprintf('css/%s%s%s.css', $name, $rtl ? '.rtl' : '', $minified ? '.min' : '');
 
-        return self::build($version, $assetBaseUrl, $path);
+        return self::build($version, $path);
     }
 
-    public static function js(string $version, string $assetBaseUrl, string $variant = 'bundle', bool $minified = true): string
+    public static function js(string $version, string $variant = 'bundle', bool $minified = true): string
     {
-        $name = match (strtolower($variant)) {
-            '', 'bootstrap' => 'bootstrap',
+        $v = strtolower($variant);
+        $name = match ($v) {
+            '', 'bootstrap', 'none' => 'bootstrap',
             'bundle' => 'bootstrap.bundle',
             'esm' => 'bootstrap.esm',
             default => $variant,
@@ -52,6 +58,6 @@ final class AssetUrlBuilder
 
         $path = sprintf('js/%s%s.js', $name, $minified ? '.min' : '');
 
-        return self::build($version, $assetBaseUrl, $path);
+        return self::build($version, $path);
     }
 }

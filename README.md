@@ -1,111 +1,124 @@
-# BootstrapPHP
+ # BootstrapPHP
 
-A Composer-ready PHP library for adding Bootstrap assets, components, and configuration to any PHP project through classes and helper functions.
+ Lightweight PHP helpers for rendering Bootstrap assets and components.
 
-Bootstrap assets are included locally under `src/Assets/dist`, so the default helpers generate local paths instead of relying on a CDN.
+ This package expects Bootstrap to be provided as a Composer dependency (`twbs/bootstrap`) and resolves assets from a fixed internal base: `/vendor/twbs/bootstrap/dist`.
+ To override specific outputs prefer `css_url` or `js_url` in your config; the internal builder base is fixed by design.
 
-## Installation
+ **Quick goals:**
+ - Provide simple tag helpers for Bootstrap CSS/JS
+ - Offer class-based component renderers (alerts, buttons, containers, etc.)
+ - Resolve assets from the vendor path; override specific URLs via `css_url` / `js_url`
 
-```bash
-composer require trilbdev/bootstrapphp
-```
+ **Installation**
 
-## What it provides
+ Install this package and Bootstrap via Composer:
 
-- Bootstrap CSS and JavaScript tag generation
-- Local Bootstrap assets included under `src/Assets/dist`
-- Configurable Bootstrap asset URLs
-- Reusable HTML component rendering with Bootstrap classes
-- Convenience helpers for common components such as alerts, buttons, containers, and accordions
-- Class-based API with per-element helper classes
+ ```bash
+ composer require trilbdev/bootstrapphp
+ composer require twbs/bootstrap
+ ```
 
-## Class-based usage
+ **Basic usage**
 
-```php
-<?php
+ ```php
+ <?php
+ require __DIR__ . '/vendor/autoload.php';
 
-require __DIR__ . '/vendor/autoload.php';
+ use BootstrapPHP\Bootstrap;
 
-use BootstrapPHP\Bootstrap;
+ // Output CSS and JS tags (defaults to vendor/twbs/bootstrap/dist)
+ echo Bootstrap::assets();
 
-echo Bootstrap::assets();
+ // Render a simple alert
+ echo Bootstrap::alert('Saved successfully', 'success');
 
-echo Bootstrap::alert('Saved successfully', 'success');
+ // Generic component
+ echo Bootstrap::component('div', 'Card content', [
+     'classes' => ['card', 'p-3'],
+ ]);
+ ```
 
-echo Bootstrap::button('Open modal', 'primary', [
-    'data-bs-toggle' => 'modal',
-    'data-bs-target' => '#exampleModal',
-]);
+ **Configuration**
 
-echo Bootstrap::container(
-    Bootstrap::component('div', 'Any Bootstrap component content', [
-        'classes' => ['card', 'p-3', 'shadow-sm'],
-    ]),
-    false,
-    [],
-    false
-);
+ The package resolves assets against the fixed base `/vendor/twbs/bootstrap/dist`. To override settings, pass a config array to `Bootstrap::config()` or `BootstrapAssets::fromArray()`. Note: to change the final CSS/JS URLs, set `css_url` or `js_url` in the config.
 
-echo Bootstrap::accordion([
-    [
-        'title' => 'Accordion Item #1',
-        'content' => '<strong>This is the first item.</strong>',
-        'opened' => true,
-    ],
-    [
-        'title' => 'Accordion Item #2',
-        'content' => 'This is the second item.',
-    ],
-]);
-```
+ Example config options:
 
-## URL helpers
+ - `version` — Bootstrap version string (informational; used when building paths containing `{version}`)
+ - `asset_base_url` — (legacy) path or URL to the Bootstrap `dist` directory. The internal builder resolves against the fixed base; use `css_url`/`js_url` to override outputs.
+ - `css_path` / `js_path` — specific files inside the dist folder to use by default
+ - `css_url` / `js_url` — full URL override for CSS/JS
 
-You can access Bootstrap asset URLs directly:
+ ```php
+ <?php
+ use BootstrapPHP\Bootstrap;
 
-```php
-<?php
+ $cfg = Bootstrap::config([
+   // package: 'css' or 'js'
+   'package' => 'js',
+   // type: grid | reboot | utilities | bundle | esm | None
+   'type' => 'bundle',
+   // build: min | None
+   'build' => 'min',
+   // rtl: true | false (CSS only)
+   'rtl' => false
+ ]);
 
-use BootstrapPHP\Bootstrap;
+ echo Bootstrap::assets($cfg);
+ ```
 
-$config = Bootstrap::config([ 'version' => '5.3.8' ]);
-
-$cssUrl = Bootstrap::cssUrl($config);
-$jsUrl = Bootstrap::jsUrl($config);
-$customUrl = Bootstrap::assetUrl('css/bootstrap.min.css', $config);
-```
-
-## Custom configuration
-
-You can point the package at a local asset directory or fully custom asset URLs:
+Example: CSS RTL
 
 ```php
 <?php
-
 use BootstrapPHP\Bootstrap;
 
-$config = Bootstrap::config([
-    'asset_base_url' => '/assets/bootstrap',
-    'css_path' => 'css/bootstrap.min.css',
-    'js_path' => 'js/bootstrap.bundle.min.js',
+$cfgcss = Bootstrap::config([
+    'package' => 'css',
+    'type' => 'None',
+    'build' => 'min',
+    'rtl' => true,
 ]);
 
-echo Bootstrap::assets($config);
+echo Bootstrap::assets($cfgcss);
+// -> /vendor/twbs/bootstrap/dist/css/bootstrap.rtl.min.css
 ```
 
-## Generic component rendering
+ **CSS / JS variants**
 
-For components not covered by the convenience helpers, use the generic renderer:
+ The helpers support common CSS/JS variants (bundle/esm, grid/reboot/utilities, RTL, minified). Use `cssUrl()` / `jsUrl()` on the config to request variants.
 
-```php
-<?php
+ **Asset publishing**
 
-use BootstrapPHP\Bootstrap;
+ This package does not copy vendor assets to a web root. In many deployments you should publish or symlink `vendor/twbs/bootstrap/dist` into your public assets folder (for example `public/vendor/bootstrap`) or set `asset_base_url` to a web-accessible path.
 
-echo Bootstrap::component('div', 'Dismissible alert body', [
-    'classes' => ['alert', 'alert-warning', 'alert-dismissible', 'fade', 'show'],
-    'attributes' => [
-        'role' => 'alert',
-    ],
-]);
-```
+ Example (simple copy):
+
+ ```bash
+ mkdir -p public/vendor/bootstrap
+ cp -r vendor/twbs/bootstrap/dist/* public/vendor/bootstrap/
+ ```
+
+ Or set `asset_base_url` to the published path.
+
+ **API highlights**
+
+ - `Bootstrap::assets($config = null)` — prints `<link>`/`<script>` tags for CSS and JS
+ - `Bootstrap::cssUrl($variant, $rtl = false, $minified = true)` — returns CSS path for a variant
+ - `Bootstrap::jsUrl($variant = 'bundle', $minified = true)` — returns JS path for a variant
+ - `Bootstrap::component($tag, $content, $options = [])` — generic renderer
+ - Entrypoint classes: `Bootstrap::components()`, `Bootstrap::content()`, `Bootstrap::forms()`, `Bootstrap::helpers()`, `Bootstrap::layout()`, `Bootstrap::utilities()`
+
+ **Development notes**
+
+ - When this package is installed as a Composer dependency, the runtime detection attempts to locate the Bootstrap dist directory relative to the package location. If detection fails, explicitly set `asset_base_url`.
+ - Run `php -l` to verify syntax across files during development.
+
+ **Contributing**
+
+ Contributions welcome — open issues or PRs. Keep changes small and unit-test where appropriate.
+
+ **License**
+
+ This project follows the LICENSE file in the repository.
