@@ -1,4 +1,30 @@
 {
+  "name": "mrtrilb/bootstrapphp",
+  "description": "Lightweight PHP helpers for rendering Bootstrap assets and components.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "MrTrilB",
+      "email": ""
+    }
+  ],
+  "require": {
+    "php": "^8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "BootstrapPHP\\": "src/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  },
+  "keywords": ["bootstrap","php","helpers","components"]
+}
+{
     "name": "trilbdev/bootstrapphp",
     "description": "Bootstrap helpers and configuration for any PHP project.",
     "type": "library",
