@@ -26,29 +26,9 @@ class BootstrapAssets
 
     public static function fromArray(array $config = []): self
     {
-        $provided = $config['asset_base_url'] ?? null;
-
-        if ($provided !== null && $provided !== '') {
-            $assetBaseUrl = (string) $provided;
-        } else {
-            // Prefer project-level vendor path when available (developer workspace)
-            $projectVendorDist = getcwd() . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'twbs' . DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'dist';
-
-            if (is_dir($projectVendorDist)) {
-                $assetBaseUrl = 'vendor/twbs/bootstrap/dist';
-            } else {
-                // When this package is itself installed under vendor, locate the vendor root
-                $possibleVendorRoot = dirname(__DIR__, 4);
-                $installedVendorDist = $possibleVendorRoot . DIRECTORY_SEPARATOR . 'twbs' . DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'dist';
-
-                if (is_dir($installedVendorDist)) {
-                    $real = realpath($installedVendorDist);
-                    $assetBaseUrl = $real !== false ? str_replace('\\', '/', $real) : $installedVendorDist;
-                } else {
-                    $assetBaseUrl = 'src/Assets/dist';
-                }
-            }
-        }
+        // The asset base is fixed and authoritative in AssetUrlBuilder; ignore
+        // any `asset_base_url` values from user config to avoid conflicting paths.
+        $assetBaseUrl = 'vendor/twbs/bootstrap/dist';
 
         return new self(
             version: (string) ($config['version'] ?? '5.3.3'),
